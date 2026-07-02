@@ -1,4 +1,5 @@
 from config.celery import app
+from apps.analytics.models import AnalyticsEvent
 
 
 @app.task
@@ -8,7 +9,12 @@ def summarize_conversation(conversation_id):
 
 @app.task
 def track_event(user_id, event_name, payload=None):
-    return {"user_id": str(user_id), "event_name": event_name, "payload": payload or {}}
+    event = AnalyticsEvent.objects.create(
+        user_id=user_id,
+        event_name=event_name,
+        payload=payload or {},
+    )
+    return {"id": str(event.id), "user_id": str(user_id), "event_name": event_name}
 
 
 @app.task

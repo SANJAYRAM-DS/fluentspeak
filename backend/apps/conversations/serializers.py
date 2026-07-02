@@ -16,8 +16,31 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ["id", "conversation", "role", "content", "turn_number", "created_at", "feedback"]
-        read_only_fields = ["id", "conversation", "role", "turn_number", "created_at", "feedback"]
+        fields = [
+            "id",
+            "conversation",
+            "role",
+            "content",
+            "turn_number",
+            "token_count",
+            "latency_ms",
+            "provider",
+            "model",
+            "created_at",
+            "feedback",
+        ]
+        read_only_fields = [
+            "id",
+            "conversation",
+            "role",
+            "turn_number",
+            "token_count",
+            "latency_ms",
+            "provider",
+            "model",
+            "created_at",
+            "feedback",
+        ]
 
 
 class ConversationStateSerializer(serializers.ModelSerializer):
@@ -62,3 +85,16 @@ class CreateConversationSerializer(serializers.Serializer):
 
 class SendMessageSerializer(serializers.Serializer):
     message = serializers.CharField()
+    client_message_id = serializers.UUIDField(required=False)
+    conversation_revision = serializers.IntegerField(required=False)
+
+
+class TurnResponseSerializer(serializers.Serializer):
+    turn_id = serializers.UUIDField()
+    conversation_id = serializers.UUIDField()
+    reply = serializers.CharField()
+    correction = serializers.CharField()
+    optimized_response = serializers.CharField()
+    vocabulary = serializers.DictField(required=False, allow_null=True)
+    next_question = serializers.CharField(required=False, allow_blank=True)
+    conversation_revision = serializers.IntegerField()

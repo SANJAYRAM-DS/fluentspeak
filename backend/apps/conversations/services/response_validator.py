@@ -1,5 +1,5 @@
 class ResponseValidator:
-    REQUIRED_KEYS = {"reply", "correction", "optimized", "next_question", "vocabulary", "examples"}
+    REQUIRED_KEYS = {"reply", "correction", "optimized_response", "next_question", "vocabulary", "examples"}
 
     @classmethod
     def validate(cls, response):

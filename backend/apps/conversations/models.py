@@ -36,6 +36,10 @@ class Message(UUIDModel):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     content = models.TextField()
     turn_number = models.IntegerField(default=0)
+    token_count = models.IntegerField(default=0)
+    latency_ms = models.IntegerField(default=0)
+    provider = models.CharField(max_length=50, blank=True)
+    model = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -68,6 +72,7 @@ class ConversationState(models.Model):
     goal_progress = models.IntegerField(default=0)
     last_vocab_word = models.CharField(max_length=100, blank=True)
     summary = models.TextField(blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "conversation_states"

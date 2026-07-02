@@ -1,13 +1,17 @@
+import json
+
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
+from apps.ai.services.groq_client import GroqClient
 from apps.scenarios.models import Scenario
 from apps.topics.models import Topic
 
 from ..models import Conversation, ConversationState, Message, MessageFeedback
 from ..repositories import ConversationRepository
-from .ai_router import AIRouter
 from .memory_service import MemoryService
 from .prompt_builder import PromptBuilder
+from .vocabulary_service import VocabularyService
 from .response_validator import ResponseValidator
 from .state_machine import ConversationStateMachine
 
@@ -38,37 +42,61 @@ class ConversationService:
         return {"conversation": conversation, "first_message": first_message}
 
     @staticmethod
-    def send_message(user, conversation_id, message):
+    def generate_turn(user, conversation_id, message, client_message_id=None, conversation_revision=None):
         conversation = ConversationRepository.get_for_user(user, conversation_id)
+        if conversation_revision is not None and conversation_revision != conversation.current_turn:
+            raise ValidationError({"conversation_revision": "Conversation revision mismatch."})
+        learned_words = VocabularyService.get_seen_words(user)
+        prompt = PromptBuilder.build(conversation, message, learned_words)
+        ai_client = GroqClient()
+        ai_result = ai_client.complete_json(prompt)
+        ai_response = ResponseValidator.validate(json.loads(ai_result.content))
         turn_number = conversation.current_turn + 1
-        Message.objects.create(
-            conversation=conversation,
-            role=Message.ROLE_USER,
-            content=message,
-            turn_number=turn_number,
-        )
-        MemoryService.update_summary(conversation)
-        prompt = PromptBuilder.build(conversation, message)
-        ai_response = ResponseValidator.validate(AIRouter.generate_reply(prompt))
-        assistant_message = Message.objects.create(
-            conversation=conversation,
-            role=Message.ROLE_ASSISTANT,
-            content=ai_response["reply"],
-            turn_number=turn_number,
-        )
-        MessageFeedback.objects.create(
-            message=assistant_message,
-            correction=ai_response["correction"],
-            optimized_response=ai_response["optimized"],
-            next_question=ai_response["next_question"],
-        )
-        conversation.current_turn = turn_number
-        conversation.save(update_fields=["current_turn", "updated_at"])
-        ConversationStateMachine.advance(conversation.state)
+        with transaction.atomic():
+            Message.objects.create(
+                conversation=conversation,
+                role=Message.ROLE_USER,
+                content=message,
+                turn_number=turn_number,
+                provider="user",
+            )
+            assistant_message = Message.objects.create(
+                conversation=conversation,
+                role=Message.ROLE_ASSISTANT,
+                content=ai_response["reply"],
+                turn_number=turn_number,
+                token_count=ai_result.token_count,
+                latency_ms=ai_result.latency_ms,
+                provider=ai_result.provider,
+                model=ai_result.model,
+            )
+            MessageFeedback.objects.create(
+                message=assistant_message,
+                correction=ai_response["correction"],
+                optimized_response=ai_response["optimized_response"],
+                next_question=ai_response.get("next_question", ""),
+            )
+            vocabulary_payload = VocabularyService.register_word(user, ai_response.get("vocabulary"))
+            MemoryService.update_summary(conversation, user_message=message, assistant_reply=ai_response["reply"])
+            conversation.current_turn = turn_number
+            conversation.save(update_fields=["current_turn", "summary", "updated_at"])
+            state, _ = ConversationState.objects.get_or_create(conversation=conversation)
+            ConversationStateMachine.advance(state)
         return {
+            "turn_id": assistant_message.id,
+            "conversation_id": conversation.id,
             "reply": ai_response["reply"],
             "correction": ai_response["correction"],
-            "optimized": ai_response["optimized"],
-            "vocabulary": ai_response["vocabulary"],
-            "examples": ai_response["examples"],
+            "optimized_response": ai_response["optimized_response"],
+            "vocabulary": vocabulary_payload,
+            "next_question": ai_response.get("next_question", ""),
+            "conversation_revision": conversation.current_turn,
         }
+
+    @staticmethod
+    def stream_turn(user, conversation_id, message):
+        result = ConversationService.generate_turn(user, conversation_id, message)
+        payload = json.dumps(result)
+        for start in range(0, len(payload), 32):
+            yield f"data: {payload[start:start + 32]}\n\n"
+        yield "event: done\ndata: {}\n\n"

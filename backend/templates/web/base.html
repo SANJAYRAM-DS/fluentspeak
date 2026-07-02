@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FluentFlow AI</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="/dashboard/">
+      <span class="brand-mark">F</span>
+      <span>FluentFlow AI</span>
+    </a>
+    <nav class="nav">
+      <a href="/dashboard/">Dashboard</a>
+      <a href="/chat/">Chat</a>
+      <a href="/vocabulary/">Vocabulary</a>
+      <a href="/progress/">Progress</a>
+    </nav>
+    <button class="ghost-button" data-action="logout" type="button">Logout</button>
+  </header>
+  <main class="shell">
+    {% block content %}{% endblock %}
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

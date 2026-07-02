@@ -6,5 +6,5 @@ class ConversationStateMachine:
             state.stage = "completed"
         elif state.goal_progress >= 50:
             state.stage = "practice"
-        state.save(update_fields=["goal_progress", "stage"])
+        state.save(update_fields=["goal_progress", "stage", "updated_at"])
         return state

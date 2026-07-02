@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FluentFlow AI - Progress</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="dashboard.html">
+      <span class="brand-mark">F</span>
+      <span>FluentFlow AI</span>
+    </a>
+    <nav class="nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="chat.html">Chat</a>
+      <a href="vocabulary.html">Vocabulary</a>
+      <a href="progress.html">Progress</a>
+    </nav>
+    <button class="ghost-button" data-action="logout" type="button">Logout</button>
+  </header>
+  <main class="shell">
+    <section class="hero-band compact-hero">
+      <div>
+        <div class="eyebrow">Your progress</div>
+        <h1>Practice streak, minutes, and words learned.</h1>
+        <p>Use this page to check whether your daily habit is moving the needle.</p>
+      </div>
+      <div class="hero-stats" id="progress-summary"></div>
+    </section>
+    <section class="content-band">
+      <div class="section-head">
+        <h2>Learning activity</h2>
+        <p>These cards show how the practice rhythm is building over time.</p>
+      </div>
+      <div id="progress-timeline" class="stack-list"></div>
+    </section>
+  </main>
+  <script>
+    window.API_BASE_URL = "http://127.0.0.1:8000";
+  </script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

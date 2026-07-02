@@ -1,0 +1,34 @@
+{% extends "web/base.html" %}
+{% block content %}
+<section class="chat-layout">
+  <div class="chat-main">
+    <div class="section-head">
+      <h1>Conversation</h1>
+      <p>Write a message, then get a correction and a better version back.</p>
+    </div>
+    <div id="chat-thread" class="thread chat-thread"></div>
+    <form id="chat-form" class="composer">
+      <input name="message" type="text" placeholder="I go market yesterday" required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <aside class="chat-side">
+    <div class="panel-card">
+      <h2>Current lesson</h2>
+      <div id="current-lesson">Choose a topic from the dashboard.</div>
+    </div>
+    <div class="panel-card">
+      <h2>Correction</h2>
+      <div id="feedback-correction">Your correction will appear here.</div>
+    </div>
+    <div class="panel-card">
+      <h2>Optimized response</h2>
+      <div id="feedback-optimized">A natural alternative will appear here.</div>
+    </div>
+    <div class="panel-card">
+      <h2>Vocabulary</h2>
+      <div id="feedback-vocab">One new word at a time.</div>
+    </div>
+  </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "web/base.html" %}
+{% block content %}
+<section class="hero-band">
+  <div class="hero-copy">
+    <div class="eyebrow">Today’s lesson path</div>
+    <h1 id="dashboard-title">Pick a topic and keep the streak alive.</h1>
+    <p id="dashboard-subtitle">Jump back in with a short practice round, then let the AI guide the next one.</p>
+    <div class="hero-actions">
+      <a class="primary-link" href="/chat/">Continue practice</a>
+      <a class="secondary-link" href="/vocabulary/">Review vocabulary</a>
+    </div>
+  </div>
+  <div class="hero-stats" id="dashboard-summary"></div>
+</section>
+<section class="content-band">
+  <div class="section-head">
+    <h2>Suggested topics</h2>
+    <p>Tap a card to open a new conversation.</p>
+  </div>
+  <div id="topics-list" class="card-grid topic-grid"></div>
+</section>
+<section class="content-band split-band">
+  <div>
+    <div class="section-head">
+      <h2>Scenario starters</h2>
+      <p>Quick roleplays for interviews, travel, and daily life.</p>
+    </div>
+    <div id="scenario-list" class="stack-list"></div>
+  </div>
+  <div>
+    <div class="section-head">
+      <h2>Learning loop</h2>
+      <p>Each turn gives you correction, a better version, and one new word.</p>
+    </div>
+    <div class="step-list">
+      <article class="step-card"><strong>1</strong><span>You write naturally</span></article>
+      <article class="step-card"><strong>2</strong><span>AI corrects and improves</span></article>
+      <article class="step-card"><strong>3</strong><span>You keep the conversation going</span></article>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -11,6 +12,20 @@ load_dotenv(ROOT_DIR / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+GROQ_KEYS = [
+    key
+    for key in (
+        os.getenv("api1"),
+        os.getenv("api2"),
+        os.getenv("api3"),
+        os.getenv("api4"),
+        os.getenv("api5"),
+        os.getenv("GROQ_API_KEY"),
+    )
+    if key
+]
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -20,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "apps.users",
     "apps.topics",
@@ -30,6 +46,7 @@ INSTALLED_APPS = [
     "apps.analytics",
     "apps.notifications",
     "apps.tasks",
+    "apps.web",
 ]
 
 MIDDLEWARE = [
@@ -74,6 +91,14 @@ DATABASES = {
     }
 }
 
+if any(command in sys.argv for command in ["test", "pytest"]):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test.sqlite3",
+        }
+    }
+
 AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
@@ -91,6 +116,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [

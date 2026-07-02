@@ -53,6 +53,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "email", "is_active", "is_verified", "created_at", "profile"]
 
 
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["full_name", "avatar_url", "level", "daily_goal", "timezone"]
+
+
 class AuthTokenSerializer(serializers.Serializer):
     user = UserSerializer()
     refresh = serializers.CharField()
