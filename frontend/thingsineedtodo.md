@@ -40,7 +40,6 @@
 - Added refresh-token blacklist logout in `backend/apps/users/views.py`.
 - Added Django template screens for auth, dashboard, chat, vocabulary, and progress.
 - Added a standalone frontend in `frontend/` with HTML, CSS, and JavaScript pages.
-- Added tests for auth, conversation turns, topic seeding, and analytics events.
 
 ## Nice To Have
 - Add Docker Compose for PostgreSQL, Redis, and Django.
