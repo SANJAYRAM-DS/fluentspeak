@@ -39,7 +39,6 @@ class VocabularyWord(models.Model):
 
     word = models.CharField(
         max_length=100,
-        unique=True
     )
 
     definition = models.TextField()
@@ -80,6 +79,8 @@ class VocabularyWord(models.Model):
         ordering = ["word"]
         verbose_name = "Vocabulary Word"
         verbose_name_plural = "Vocabulary Words"
+
+        unique_together = ("word", "topic")
 
     def __str__(self):
         return self.word
