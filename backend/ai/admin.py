@@ -15,7 +15,6 @@ class AIProviderAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
-        "provider_name",
         "is_active",
     )
 
@@ -35,19 +34,22 @@ class AIRequestAdmin(admin.ModelAdmin):
     list_display = (
         "conversation",
         "provider",
+        "model_name",
+        "request_status",
         "total_tokens",
         "latency_ms",
-        "request_status",
         "created_at",
     )
 
     list_filter = (
-        "request_status",
         "provider",
+        "request_status",
     )
 
     search_fields = (
         "conversation__title",
+        "provider__provider_name",
+        "model_name",
     )
 
     ordering = (

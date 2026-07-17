@@ -26,6 +26,13 @@ class MessageSender(models.TextChoices):
     AI = "ai", "AI"
 
 
+class MessageType(models.TextChoices):
+    TEXT = "text", "Text"
+    SYSTEM = "system", "System"
+    CORRECTION = "correction", "Correction"
+    VOCABULARY = "vocabulary", "Vocabulary"
+
+
 class Conversation(models.Model):
 
     id = models.UUIDField(
@@ -54,9 +61,7 @@ class Conversation(models.Model):
         related_name="conversations"
     )
 
-    title = models.CharField(
-        max_length=255
-    )
+    title = models.CharField(max_length=255)
 
     status = models.CharField(
         max_length=20,
@@ -64,26 +69,20 @@ class Conversation(models.Model):
         default=ConversationStatus.ACTIVE
     )
 
-    total_turns = models.PositiveIntegerField(
-        default=0
-    )
+    current_turn = models.PositiveIntegerField(default=0)
 
-    started_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    total_turns = models.PositiveIntegerField(default=0)
+
+    started_at = models.DateTimeField(auto_now_add=True)
 
     ended_at = models.DateTimeField(
         null=True,
         blank=True
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    updated_at = models.DateTimeField(
-        auto_now=True
-    )
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "conversations"
@@ -108,17 +107,11 @@ class ConversationState(models.Model):
         default=ConversationStage.INTRODUCTION
     )
 
-    current_goal = models.TextField(
-        blank=True
-    )
+    current_goal = models.TextField(blank=True)
 
-    progress_percentage = models.PositiveSmallIntegerField(
-        default=0
-    )
+    progress_percentage = models.PositiveSmallIntegerField(default=0)
 
-    conversation_summary = models.TextField(
-        blank=True
-    )
+    conversation_summary = models.TextField(blank=True)
 
     last_vocab = models.ForeignKey(
         VocabularyWord,
@@ -128,9 +121,17 @@ class ConversationState(models.Model):
         related_name="conversation_states"
     )
 
-    last_updated = models.DateTimeField(
-        auto_now=True
+    prompt_version = models.CharField(
+        max_length=20,
+        default="v1"
     )
+
+    state_data = models.JSONField(
+        default=dict,
+        blank=True
+    )
+
+    last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "conversation_states"
@@ -162,13 +163,15 @@ class Message(models.Model):
 
     message = models.TextField()
 
-    token_count = models.PositiveIntegerField(
-        default=0
+    message_type = models.CharField(
+        max_length=30,
+        choices=MessageType.choices,
+        default=MessageType.TEXT
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    token_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "messages"
@@ -192,21 +195,13 @@ class MessageFeedback(models.Model):
         related_name="feedback"
     )
 
-    grammar_correction = models.TextField(
-        blank=True
-    )
+    grammar_correction = models.TextField(blank=True)
 
-    optimized_sentence = models.TextField(
-        blank=True
-    )
+    optimized_sentence = models.TextField(blank=True)
 
-    explanation = models.TextField(
-        blank=True
-    )
+    explanation = models.TextField(blank=True)
 
-    next_question = models.TextField(
-        blank=True
-    )
+    next_question = models.TextField(blank=True)
 
     vocabulary = models.ForeignKey(
         VocabularyWord,
@@ -216,9 +211,7 @@ class MessageFeedback(models.Model):
         related_name="feedbacks"
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "message_feedback"

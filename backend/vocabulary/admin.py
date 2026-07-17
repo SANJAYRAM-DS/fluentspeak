@@ -8,19 +8,21 @@ class VocabularyWordAdmin(admin.ModelAdmin):
 
     list_display = (
         "word",
+        "topic",
         "part_of_speech",
         "difficulty",
         "created_at",
     )
 
+    list_filter = (
+        "topic",
+        "difficulty",
+        "part_of_speech",
+    )
+
     search_fields = (
         "word",
         "definition",
-    )
-
-    list_filter = (
-        "difficulty",
-        "part_of_speech",
     )
 
     ordering = (
@@ -35,22 +37,16 @@ class UserVocabularyAdmin(admin.ModelAdmin):
         "user",
         "vocabulary",
         "mastery_level",
+        "mastered",
         "times_seen",
         "times_practiced",
+    )
+
+    list_filter = (
         "mastered",
-        "last_reviewed",
     )
 
     search_fields = (
         "user__email",
         "vocabulary__word",
-    )
-
-    list_filter = (
-        "mastered",
-        "mastery_level",
-    )
-
-    ordering = (
-        "-last_reviewed",
     )

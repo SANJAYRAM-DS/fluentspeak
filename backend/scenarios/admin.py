@@ -8,26 +8,29 @@ class ScenarioAdmin(admin.ModelAdmin):
 
     list_display = (
         "title",
-        "user",
         "topic",
+        "created_by",
         "difficulty",
-        "max_turns",
+        "is_system",
         "is_public",
+        "max_turns",
         "created_at",
-    )
-
-    search_fields = (
-        "title",
-        "user__email",
-        "topic__title",
     )
 
     list_filter = (
         "difficulty",
+        "is_system",
         "is_public",
         "topic",
     )
 
+    search_fields = (
+        "title",
+        "description",
+        "learning_objective",
+        "grammar_focus",
+    )
+
     ordering = (
-        "-created_at",
+        "title",
     )

@@ -1,13 +1,18 @@
 import uuid
 
 from django.db import models
+
 from users.models import User
+from topics.models import Topic
 
 
 class Difficulty(models.TextChoices):
-    BEGINNER = "beginner", "Beginner"
-    INTERMEDIATE = "intermediate", "Intermediate"
-    ADVANCED = "advanced", "Advanced"
+    A1 = "A1", "A1 - Beginner"
+    A2 = "A2", "A2 - Elementary"
+    B1 = "B1", "B1 - Intermediate"
+    B2 = "B2", "B2 - Upper Intermediate"
+    C1 = "C1", "C1 - Advanced"
+    C2 = "C2", "C2 - Proficient"
 
 
 class PartOfSpeech(models.TextChoices):
@@ -19,8 +24,6 @@ class PartOfSpeech(models.TextChoices):
     PREPOSITION = "preposition", "Preposition"
     CONJUNCTION = "conjunction", "Conjunction"
     INTERJECTION = "interjection", "Interjection"
-    PHRASE = "phrase", "Phrase"
-    OTHER = "other", "Other"
 
 
 class VocabularyWord(models.Model):
@@ -48,14 +51,19 @@ class VocabularyWord(models.Model):
 
     part_of_speech = models.CharField(
         max_length=50,
-        choices=PartOfSpeech.choices,
-        default=PartOfSpeech.OTHER
+        choices=PartOfSpeech.choices
     )
 
     difficulty = models.CharField(
         max_length=20,
         choices=Difficulty.choices,
-        default=Difficulty.BEGINNER
+        default=Difficulty.A1
+    )
+
+    topic = models.ForeignKey(
+        Topic,
+        on_delete=models.CASCADE,
+        related_name="vocabulary_words"
     )
 
     example_sentences = models.JSONField(
@@ -79,7 +87,7 @@ class VocabularyWord(models.Model):
 
 class UserVocabulary(models.Model):
     """
-    Tracks each user's learning progress for vocabulary.
+    Tracks a user's progress for each vocabulary word.
     """
 
     id = models.UUIDField(
@@ -97,28 +105,18 @@ class UserVocabulary(models.Model):
     vocabulary = models.ForeignKey(
         VocabularyWord,
         on_delete=models.CASCADE,
-        related_name="learners"
+        related_name="users"
     )
 
-    times_seen = models.PositiveIntegerField(
-        default=0
-    )
+    times_seen = models.PositiveIntegerField(default=0)
 
-    times_practiced = models.PositiveIntegerField(
-        default=0
-    )
+    times_practiced = models.PositiveIntegerField(default=0)
 
-    mastery_level = models.PositiveSmallIntegerField(
-        default=0
-    )
+    mastery_level = models.PositiveSmallIntegerField(default=0)
 
-    mastered = models.BooleanField(
-        default=False
-    )
+    mastered = models.BooleanField(default=False)
 
-    first_seen = models.DateTimeField(
-        auto_now_add=True
-    )
+    first_seen = models.DateTimeField(auto_now_add=True)
 
     last_reviewed = models.DateTimeField(
         null=True,
@@ -127,16 +125,9 @@ class UserVocabulary(models.Model):
 
     class Meta:
         db_table = "user_vocabulary"
-        ordering = ["-last_reviewed", "-first_seen"]
+        unique_together = ("user", "vocabulary")
         verbose_name = "User Vocabulary"
         verbose_name_plural = "User Vocabulary"
-
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "vocabulary"],
-                name="unique_user_vocabulary"
-            )
-        ]
 
     def __str__(self):
         return f"{self.user.email} - {self.vocabulary.word}"

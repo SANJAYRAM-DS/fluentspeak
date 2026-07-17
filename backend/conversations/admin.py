@@ -12,13 +12,14 @@ from .models import (
 class ConversationAdmin(admin.ModelAdmin):
 
     list_display = (
-        "title",
-        "user",
-        "topic",
-        "status",
-        "total_turns",
-        "created_at",
-    )
+    "title",
+    "user",
+    "topic",
+    "status",
+    "current_turn",
+    "total_turns",
+    "created_at",
+)
 
     list_filter = (
         "status",
@@ -35,11 +36,12 @@ class ConversationAdmin(admin.ModelAdmin):
 class ConversationStateAdmin(admin.ModelAdmin):
 
     list_display = (
-        "conversation",
-        "stage",
-        "progress_percentage",
-        "last_updated",
-    )
+    "conversation",
+    "stage",
+    "progress_percentage",
+    "prompt_version",
+    "last_updated",
+)
 
     list_filter = (
         "stage",
@@ -50,15 +52,17 @@ class ConversationStateAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
 
     list_display = (
-        "conversation",
-        "sender",
-        "turn_number",
-        "token_count",
-        "created_at",
+    "conversation",
+    "sender",
+    "message_type",
+    "turn_number",
+    "token_count",
+    "created_at",
     )
 
     list_filter = (
         "sender",
+        "message_type",
     )
 
     search_fields = (

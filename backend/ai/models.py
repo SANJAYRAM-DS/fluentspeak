@@ -5,13 +5,6 @@ from django.db import models
 from conversations.models import Conversation
 
 
-class ProviderName(models.TextChoices):
-    GROQ = "groq", "Groq"
-    OPENAI = "openai", "OpenAI"
-    GEMINI = "gemini", "Gemini"
-    ANTHROPIC = "anthropic", "Anthropic"
-
-
 class RequestStatus(models.TextChoices):
     SUCCESS = "success", "Success"
     FAILED = "failed", "Failed"
@@ -20,7 +13,7 @@ class RequestStatus(models.TextChoices):
 
 class AIProvider(models.Model):
     """
-    Stores available LLM providers.
+    Stores AI provider configurations.
     """
 
     id = models.UUIDField(
@@ -31,7 +24,7 @@ class AIProvider(models.Model):
 
     provider_name = models.CharField(
         max_length=50,
-        choices=ProviderName.choices
+        unique=True
     )
 
     model_name = models.CharField(
@@ -43,7 +36,7 @@ class AIProvider(models.Model):
         blank=True
     )
 
-    priority = models.PositiveSmallIntegerField(
+    priority = models.PositiveIntegerField(
         default=1
     )
 
@@ -57,7 +50,7 @@ class AIProvider(models.Model):
 
     class Meta:
         db_table = "ai_providers"
-        ordering = ["priority", "provider_name"]
+        ordering = ["priority"]
         verbose_name = "AI Provider"
         verbose_name_plural = "AI Providers"
 
@@ -67,7 +60,7 @@ class AIProvider(models.Model):
 
 class AIRequest(models.Model):
     """
-    Stores every LLM request made by the application.
+    Logs every LLM request made by the application.
     """
 
     id = models.UUIDField(
@@ -84,8 +77,13 @@ class AIRequest(models.Model):
 
     provider = models.ForeignKey(
         AIProvider,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="requests"
+    )
+
+    # Actual model used for this request
+    model_name = models.CharField(
+        max_length=100
     )
 
     prompt_tokens = models.PositiveIntegerField(
@@ -125,4 +123,8 @@ class AIRequest(models.Model):
         verbose_name_plural = "AI Requests"
 
     def __str__(self):
-        return f"{self.provider.provider_name} - {self.request_status}"
+        return (
+            f"{self.provider.provider_name} - "
+            f"{self.model_name} - "
+            f"{self.request_status}"
+        )

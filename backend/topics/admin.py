@@ -10,21 +10,26 @@ class TopicAdmin(admin.ModelAdmin):
         "title",
         "category",
         "difficulty",
+        "grammar_focus",
+        "estimated_turns",
+        "display_order",
         "is_active",
-        "created_at",
+    )
+
+    list_filter = (
+        "category",
+        "difficulty",
+        "is_active",
     )
 
     search_fields = (
         "title",
-        "category",
-    )
-
-    list_filter = (
-        "difficulty",
-        "category",
-        "is_active",
+        "description",
+        "grammar_focus",
+        "vocabulary_focus",
     )
 
     ordering = (
+        "display_order",
         "title",
     )

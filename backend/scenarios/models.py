@@ -1,19 +1,28 @@
 import uuid
 
 from django.db import models
-from users.models import User
+
 from topics.models import Topic
+from users.models import User
 
 
 class Difficulty(models.TextChoices):
-    BEGINNER = "beginner", "Beginner"
-    INTERMEDIATE = "intermediate", "Intermediate"
-    ADVANCED = "advanced", "Advanced"
+    A1 = "A1", "A1 - Beginner"
+    A2 = "A2", "A2 - Elementary"
+    B1 = "B1", "B1 - Intermediate"
+    B2 = "B2", "B2 - Upper Intermediate"
+    C1 = "C1", "C1 - Advanced"
+    C2 = "C2", "C2 - Proficient"
 
 
 class Scenario(models.Model):
     """
-    User-created conversation scenarios.
+    Conversation scenarios.
+
+    Can be:
+    - System scenarios
+    - User-created scenarios
+    - AI-generated scenarios (future)
     """
 
     id = models.UUIDField(
@@ -22,16 +31,18 @@ class Scenario(models.Model):
         editable=False
     )
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="scenarios"
-    )
-
     topic = models.ForeignKey(
         Topic,
         on_delete=models.CASCADE,
         related_name="scenarios"
+    )
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_scenarios"
     )
 
     title = models.CharField(
@@ -50,18 +61,35 @@ class Scenario(models.Model):
         max_length=100
     )
 
-    objective = models.TextField(
+    opening_prompt = models.TextField(
+        blank=True
+    )
+
+    learning_objective = models.TextField(
         blank=True
     )
 
     difficulty = models.CharField(
         max_length=20,
         choices=Difficulty.choices,
-        default=Difficulty.BEGINNER
+        default=Difficulty.A1
+    )
+
+    grammar_focus = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    vocabulary_focus = models.TextField(
+        blank=True
     )
 
     max_turns = models.PositiveIntegerField(
         default=10
+    )
+
+    is_system = models.BooleanField(
+        default=False
     )
 
     is_public = models.BooleanField(
@@ -78,7 +106,7 @@ class Scenario(models.Model):
 
     class Meta:
         db_table = "scenarios"
-        ordering = ["-created_at"]
+        ordering = ["title"]
         verbose_name = "Scenario"
         verbose_name_plural = "Scenarios"
 
