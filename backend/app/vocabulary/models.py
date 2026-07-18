@@ -2,8 +2,8 @@ import uuid
 
 from django.db import models
 
-from users.models import User
-from topics.models import Topic
+from backend.app.users.models import User
+from backend.app.topics.models import Topic
 
 
 class Difficulty(models.TextChoices):

@@ -2,7 +2,7 @@ import uuid
 
 from django.db import models
 
-from conversations.models import Conversation
+from backend.app.conversations.models import Conversation
 
 
 class RequestStatus(models.TextChoices):

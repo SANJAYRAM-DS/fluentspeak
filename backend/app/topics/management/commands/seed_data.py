@@ -1,14 +1,14 @@
 from django.core.management.base import BaseCommand
 
-from content.travel import TRAVEL
-from content.food import FOOD
-from content.shopping import SHOPPING
-from content.interview import INTERVIEW
-from content.daily import DAILY
+from backend.app.content.travel import TRAVEL
+from backend.app.content.food import FOOD
+from backend.app.content.shopping import SHOPPING
+from backend.app.content.interview import INTERVIEW
+from backend.app.content.daily import DAILY
 
-from topics.models import Topic
-from scenarios.models import Scenario
-from vocabulary.models import VocabularyWord
+from backend.app.topics.models import Topic
+from backend.app.scenarios.models import Scenario
+from backend.app.vocabulary.models import VocabularyWord
 
 CONTENT = [
     TRAVEL,

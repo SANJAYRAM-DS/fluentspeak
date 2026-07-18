@@ -2,10 +2,10 @@ import uuid
 
 from django.db import models
 
-from users.models import User
-from topics.models import Topic
-from scenarios.models import Scenario
-from vocabulary.models import VocabularyWord
+from backend.app.users.models import User
+from backend.app.topics.models import Topic
+from backend.app.scenarios.models import Scenario
+from backend.app.vocabulary.models import VocabularyWord
 
 
 class ConversationStatus(models.TextChoices):
